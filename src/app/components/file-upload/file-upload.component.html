@@ -1,0 +1,9 @@
+<form (submit)="onSubmit()" [formGroup]="uploadFileForm">
+    <label>Seleccione archivo:</label>
+    <mat-form-field appearance="outline">
+        <input matInput ="text" formControlName="fileName" placeholder="Seleccione un archivo" readonly />
+    </mat-form-field>    
+    <input type="file" id="file-input" class="file-upload-input" (change)="onFileChange($event)" required />
+    <button mat-button type="button" (click)="triggerFileInput()">Navegar</button>
+    <button mat-button type="submit">Enviar</button>
+</form>
