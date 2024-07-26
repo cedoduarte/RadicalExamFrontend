@@ -1,0 +1,84 @@
+<table mat-table [dataSource]="excelRecords" class="mat-elevation-z8">
+    <ng-container matColumnDef="PRIMER_NOMBRE">
+        <th mat-header-cell *matHeaderCellDef>PRIMER_NOMBRE</th>
+        <td mat-cell *matCellDef="let element"> {{element.firstName}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="SEGUNDO_NOMBRE">
+        <th mat-header-cell *matHeaderCellDef>SEGUNDO_NOMBRE</th>
+        <td mat-cell *matCellDef="let element"> {{element.middleName}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="APELLIDO_PATERNO">
+        <th mat-header-cell *matHeaderCellDef>APELLIDO_PATERNO</th>
+        <td mat-cell *matCellDef="let element"> {{element.firstLastName}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="APELLIDO_MATERNO">
+        <th mat-header-cell *matHeaderCellDef>APELLIDO_MATERNO</th>
+        <td mat-cell *matCellDef="let element"> {{element.secondLastName}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="FECHA_DE_NACIMIENTO">
+        <th mat-header-cell *matHeaderCellDef>FECHA_DE_NACIMIENTO</th>
+        <td mat-cell *matCellDef="let element"> {{element.birthdate}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="RFC">
+        <th mat-header-cell *matHeaderCellDef>RFC</th>
+        <td mat-cell *matCellDef="let element"> {{element.rfc}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="COLONIA_O_POBLACION">
+        <th mat-header-cell *matHeaderCellDef>COLONIA_O_POBLACION</th>
+        <td mat-cell *matCellDef="let element"> {{element.neighborhood}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="DELEGACION_O_MUNICIPIO">
+        <th mat-header-cell *matHeaderCellDef>DELEGACION_O_MUNICIPIO</th>
+        <td mat-cell *matCellDef="let element"> {{element.delegationOrMunicipality}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="CIUDAD">
+        <th mat-header-cell *matHeaderCellDef>CIUDAD</th>
+        <td mat-cell *matCellDef="let element"> {{element.city}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="ESTADO">
+        <th mat-header-cell *matHeaderCellDef>ESTADO</th>
+        <td mat-cell *matCellDef="let element"> {{element.state}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="C.P.">
+        <th mat-header-cell *matHeaderCellDef>C.P.</th>
+        <td mat-cell *matCellDef="let element"> {{element.zipCode}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="DIRECCION_CALLE_NUMERO">
+        <th mat-header-cell *matHeaderCellDef>DIRECCION_CALLE_NUMERO</th>
+        <td mat-cell *matCellDef="let element"> {{element.address}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="SALDO_ACTUAL">
+        <th mat-header-cell *matHeaderCellDef>SALDO_ACTUAL</th>
+        <td mat-cell *matCellDef="let element"> {{element.currentBalance}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="LIMITE_DE_CREDITO">
+        <th mat-header-cell *matHeaderCellDef>LIMITE_DE_CREDITO</th>
+        <td mat-cell *matCellDef="let element"> {{element.creditLimit}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="SALDO_VENCIDO">
+        <th mat-header-cell *matHeaderCellDef>SALDO_VENCIDO</th>
+        <td mat-cell *matCellDef="let element"> {{element.balanceDue}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="SALDO_DISPONIBLE">
+        <th mat-header-cell *matHeaderCellDef>SALDO_DISPONIBLE</th>
+        <td mat-cell *matCellDef="let element"> {{element.availableBalance}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

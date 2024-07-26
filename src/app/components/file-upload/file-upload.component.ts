@@ -25,7 +25,6 @@ export class FileUploadComponent {
       let formData = new FormData();
       formData.append("file", this.selectedFile, this.selectedFile.name);
       this.formDataReady.emit(formData);
-      this.toastr.success("OK");
     } else {
       this.toastr.error("¡Debe seleccionar un archivo antes de enviarlo!");
     }

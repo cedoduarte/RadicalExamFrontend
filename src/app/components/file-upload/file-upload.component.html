@@ -1,4 +1,4 @@
-<form (submit)="onSubmit()" [formGroup]="uploadFileForm">
+<form class="file-upload-form" (submit)="onSubmit()" [formGroup]="uploadFileForm">
     <label>Seleccione archivo:</label>
     <mat-form-field appearance="outline">
         <input matInput ="text" formControlName="fileName" placeholder="Seleccione un archivo" readonly />

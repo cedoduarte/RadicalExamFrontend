@@ -1,0 +1,62 @@
+.home-header {
+    position: relative;
+    text-align: center;
+}
+
+.home-file-upload {
+    position: relative;
+    top: 10px;
+    left: 10px;
+    width: 500px;
+}
+
+.home-statistics {
+    position: relative;
+    top: 20px;
+    left: 10px;
+}
+
+.home-result {
+    font-weight: bold;
+}
+
+.home-table-container {
+    position: relative;
+    top: 40px;
+}
+
+.home-pagination-nav {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.home-pagination-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.home-pagination-item {
+    margin: 0 5px;
+}
+
+.home-pagination-item a {
+    text-decoration: none;
+    color: #007bff;
+    padding: 10px 15px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.home-pagination-item a:hover {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.home-pagination-current-item {
+    background-color: #007bff !important;
+    color: #ffffff !important;
+}

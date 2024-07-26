@@ -1,0 +1,1 @@
+export const UPLOAD_FILE_ENDPOINT: string = "https://localhost:7105/api/Upload/upload";
