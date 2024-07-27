@@ -60,3 +60,15 @@
     background-color: #007bff !important;
     color: #ffffff !important;
 }
+
+.home-chart {
+    width: 500px;
+    height: 500px;
+    flex: 1;
+    margin: 10px;
+    padding: 20px;
+}
+
+.home-chart-container {
+    display: flex;
+}

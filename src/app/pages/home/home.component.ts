@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FileUploadComponent } from "../../components/file-upload/file-upload.component";
 import { HttpClient } from "@angular/common/http";
 import { share } from 'rxjs';
@@ -7,6 +7,9 @@ import { DocumentTableViewComponent } from '../../components/document-table-view
 import { IExcelDocument, IExcelRecord } from '../../shared/interfaces';
 import { CommonModule } from '@angular/common';
 import { UPLOAD_FILE_ENDPOINT } from '../../shared/constants';
+import { Chart, registerables } from "chart.js";
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-home',
@@ -15,7 +18,7 @@ import { UPLOAD_FILE_ENDPOINT } from '../../shared/constants';
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   http = inject(HttpClient);
   toastr = inject(ToastrService);
   excelRecords: IExcelRecord[] = [];
@@ -25,7 +28,11 @@ export class HomeComponent {
   maxCurrentBalanceRecord: IExcelRecord | null = null;
   currentBalanceSum: number = 0.0;
   creditLimitSum: number = 0.0;
+  availableBalanceSum: number = 0.0;
   balanceDueSum: number = 0.0;
+  stateCurrentBalance: Map<string, number> = new Map();
+  stateCurrentBalanceChart: any;
+  balancePieChart: any;
 
   // pagination
   currentPage: number = 1;
@@ -36,18 +43,21 @@ export class HomeComponent {
   firstIndex: number = -1;
   recordList: IExcelRecord[] = [];
 
+  ngOnInit() {
+  }
+
   fileUploaded(event: any) {
     let formData = event as FormData;
     this.http.post<IExcelDocument>(UPLOAD_FILE_ENDPOINT, formData).pipe(share())
-    .subscribe(data => {
-      let { records } = data as IExcelDocument;
-      this.excelRecords = records;
-      this.computeStatistics();
-      this.updatePagination();
-      this.updateRecords();
-    }, errorObject => {
-      this.toastr.error(errorObject.error);
-    });
+      .subscribe(data => {
+        let { records } = data as IExcelDocument;
+        this.excelRecords = records;
+        this.computeStatistics();
+        this.updatePagination();
+        this.updateRecords();
+      }, errorObject => {
+        this.toastr.error(errorObject.error);
+      });
   }
 
   computeMinAndMaxCurrentBalanceRecords() {
@@ -86,6 +96,14 @@ export class HomeComponent {
     return sum;
   }
 
+  getAvailableBalanceSum(): number {
+    let sum: number = 0.0;
+    for (let iRecord = 0; iRecord < this.excelRecords.length; iRecord++) {
+      sum += this.excelRecords[iRecord].availableBalance;
+    }
+    return sum;
+  }
+
   getBalanceDueSum(): number {
     let sum: number = 0.0;
     for (let iRecord = 0; iRecord < this.excelRecords.length; iRecord++) {
@@ -93,12 +111,70 @@ export class HomeComponent {
     }
     return sum;
   }
-  
+
+  computeStateCurrentBalance() {
+    for (let iRecord = 0; iRecord < this.excelRecords.length; ++iRecord) {
+      const stateName: string = this.excelRecords[iRecord].state;
+      const currentBalance: number = this.excelRecords[iRecord].currentBalance;
+      if (this.stateCurrentBalance.has(stateName)) {
+        const stateBalance: number | undefined = this.stateCurrentBalance.get(stateName);
+        if (stateBalance) {
+          const newStateBalance: number = stateBalance + currentBalance;
+          this.stateCurrentBalance.set(stateName, newStateBalance);
+        }
+      } else {
+        this.stateCurrentBalance.set(stateName, currentBalance);
+      }
+    }
+  }
+
+  createStateCurrentBalanceChart() {
+    this.stateCurrentBalanceChart = new Chart("stateCurrentBalanceChart", {
+      type: "bar",
+      data: {
+        labels: Array.from(this.stateCurrentBalance.keys()),
+        datasets: [
+          {
+            label: "Saldo actual",
+            data: Array.from(this.stateCurrentBalance.values())
+          }
+        ]
+      },
+      options: {
+        aspectRatio: 1
+      }
+    });
+  }
+
+  createBalancePieChart() {
+    const currentBalancePercentage: number = this.currentBalanceSum * 100.0 / this.creditLimitSum;
+    const availableBalancePercentage: number = this.availableBalanceSum * 100.0 / this.creditLimitSum;
+    this.balancePieChart = new Chart("balancePieChart", {
+      type: "pie",
+      data: {
+        labels: [ "Saldo actual", "Saldo disponible" ],
+        datasets: [
+          {
+            label: "Porcentaje de saldo",
+            data: [currentBalancePercentage, availableBalancePercentage]
+          }
+        ]
+      },
+      options: {
+        aspectRatio: 1
+      }
+    });
+  }
+
   computeStatistics() {
     this.computeMinAndMaxCurrentBalanceRecords();
     this.currentBalanceSum = this.getCurrentBalanceSum();
-    this.creditLimitSum = this.getCreditLimitSum();  
-    this.balanceDueSum = this.getBalanceDueSum();   
+    this.creditLimitSum = this.getCreditLimitSum();
+    this.availableBalanceSum = this.getAvailableBalanceSum();
+    this.balanceDueSum = this.getBalanceDueSum();
+    this.computeStateCurrentBalance();
+    this.createStateCurrentBalanceChart();
+    this.createBalancePieChart();
   }
 
   getRecordFullName(record: IExcelRecord | null): string {
@@ -130,7 +206,7 @@ export class HomeComponent {
     this.currentPage = pageIndex;
     this.updateRecords();
   }
-  
+
   nextPage() {
     if (this.currentPage !== this.pageCount) {
       this.currentPage++;
