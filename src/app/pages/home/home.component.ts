@@ -4,23 +4,44 @@ import { HttpClient } from "@angular/common/http";
 import { share } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { DocumentTableViewComponent } from '../../components/document-table-view/document-table-view.component';
-import { IExcelDocument, IExcelRecord } from '../../shared/interfaces';
+import { IBanxicoSerie, IExcelDocument, IExcelRecord } from '../../shared/interfaces';
 import { CommonModule } from '@angular/common';
-import { UPLOAD_FILE_ENDPOINT } from '../../shared/constants';
+import { UPLOAD_FILE_ENDPOINT, WEATHER_TEMPERATURE_ENDPOINT, BANXICO_EXCHANGE_RATE_ENDPOINT } from '../../shared/constants';
 import { Chart, registerables } from "chart.js";
+import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
+import { DatePipe } from '@angular/common';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FileUploadComponent, DocumentTableViewComponent],
+  imports: [
+    CommonModule,
+    FileUploadComponent,
+    DocumentTableViewComponent,
+    MatButtonModule,
+    MatInputModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ReactiveFormsModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatNativeDateModule
+  ],
+  providers: [provideNativeDateAdapter(), DatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
   http = inject(HttpClient);
   toastr = inject(ToastrService);
+  datePipe = inject(DatePipe);
   excelRecords: IExcelRecord[] = [];
 
   // statistics
@@ -33,6 +54,8 @@ export class HomeComponent implements OnInit {
   stateCurrentBalance: Map<string, number> = new Map();
   stateCurrentBalanceChart: any;
   balancePieChart: any;
+  cityName: string = "Hermosillo";
+  currentCityTemperature: string = "loading...";
 
   // pagination
   currentPage: number = 1;
@@ -43,7 +66,26 @@ export class HomeComponent implements OnInit {
   firstIndex: number = -1;
   recordList: IExcelRecord[] = [];
 
+  // banxico
+  startDate: string | null = "";
+  endDate: string | null = "";
+  banxicoForm = new FormGroup({
+    banxicoToken: new FormControl("", Validators.required),
+    startDate: new FormControl("", Validators.required),
+    endDate: new FormControl("", Validators.required)
+  });
+
   ngOnInit() {
+    this.getCurrentCityTemperature();
+  }
+
+  getCurrentCityTemperature() {
+    this.http.get<string>(`${WEATHER_TEMPERATURE_ENDPOINT}/${this.cityName}`).pipe(share())
+      .subscribe(data => {
+        this.currentCityTemperature = data;
+      }, errorObject => {
+        this.toastr.error(errorObject.error);
+      });
   }
 
   fileUploaded(event: any) {
@@ -152,7 +194,7 @@ export class HomeComponent implements OnInit {
     this.balancePieChart = new Chart("balancePieChart", {
       type: "pie",
       data: {
-        labels: [ "Saldo actual", "Saldo disponible" ],
+        labels: ["Saldo actual", "Saldo disponible"],
         datasets: [
           {
             label: "Porcentaje de saldo",
@@ -212,5 +254,36 @@ export class HomeComponent implements OnInit {
       this.currentPage++;
       this.updateRecords();
     }
+  }
+
+  startDateChange(event: any) {
+    const selectedDate = event.value;
+    this.startDate = this.datePipe.transform(selectedDate, 'yyyy-MM-dd');
+  }
+  
+  endDateChange(event: any) {
+    const selectedDate = event.value;
+    this.endDate = this.datePipe.transform(selectedDate, 'yyyy-MM-dd');
+  }
+
+  banxicoFormSubmit() {
+    if (!this.banxicoForm.valid) {
+      if (!this.banxicoForm.controls.banxicoToken.valid) {
+        this.toastr.error("¡Necesita ingresar un token para poder usar Banxico!");
+      } else if (!this.banxicoForm.controls.startDate.valid) {
+        this.toastr.error("¡Necesita ingresar una fecha de inicio!");
+      } else if (!this.banxicoForm.controls.endDate.valid) {
+        this.toastr.error("¡Necesita ingresar una fecha de fin!");
+      }
+      return;
+    }
+    const banxicoToken: string | null | undefined = this.banxicoForm.value.banxicoToken;
+    this.http.get<IBanxicoSerie>(`${BANXICO_EXCHANGE_RATE_ENDPOINT}/${this.startDate}/${this.endDate}/${banxicoToken}`).pipe(share())
+    .subscribe(data => {
+      const serie: IBanxicoSerie = data;
+      console.log(serie);
+    }, errorObject => {
+      this.toastr.error(errorObject.error);
+    });
   }
 }

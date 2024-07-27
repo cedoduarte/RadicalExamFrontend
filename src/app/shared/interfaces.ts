@@ -20,3 +20,14 @@ export interface IExcelRecord {
 export interface IExcelDocument {
     records: IExcelRecord[];
 }
+
+export interface IBanxicoRecord {
+    date: string;
+    value: string;
+}
+
+export interface IBanxicoSerie {
+    idSerie: string;
+    title: string;
+    records: IBanxicoRecord[];
+}

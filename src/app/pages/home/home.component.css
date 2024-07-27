@@ -3,6 +3,10 @@
     text-align: center;
 }
 
+.home-current-city-temperature {
+    color: red;
+}
+
 .home-file-upload {
     position: relative;
     top: 10px;
@@ -22,7 +26,7 @@
 
 .home-table-container {
     position: relative;
-    top: 40px;
+    top: 50px;
 }
 
 .home-pagination-nav {
@@ -71,4 +75,10 @@
 
 .home-chart-container {
     display: flex;
+}
+
+.home-banxico {
+    position: relative;
+    top: 40px;
+    left: 10px;
 }
