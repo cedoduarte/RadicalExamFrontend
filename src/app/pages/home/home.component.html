@@ -9,6 +9,7 @@
     <app-file-upload (formDataReady)="fileUploaded($event)" />
 </div>
 
+@if (displayStatistics) {
 <div class="home-statistics">
     <div>Persona con menor saldo actual: <span class="home-result">{{ getRecordFullName(minCurrentBalanceRecord)
             }}</span></div>
@@ -18,42 +19,6 @@
     <div>Suma de todos los saldos actuales: <span class="home-result">{{ currentBalanceSum }}</span></div>
     <div>Suma de todos los límites de crédito: <span class="home-result">{{ creditLimitSum }}</span></div>
     <div>Suma de todos los saldos vencidos: <span class="home-result">{{ balanceDueSum }}</span></div>
-</div>
-
-<div class="home-banxico">
-    <form (submit)="banxicoFormSubmit()" [formGroup]="banxicoForm">
-        <mat-form-field appearance="outline">
-            <input matInput type="text" formControlName="banxicoToken" placeholder="Ingrese token de Banxico" />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-            <mat-label>Fecha de inicio</mat-label>
-            <input
-                matInput
-                [matDatepicker]="startPicker"
-                name="startDate"
-                formControlName="startDate"
-                (dateChange)="startDateChange($event)" />
-            <mat-hint>MM/DD/YYYY</mat-hint>
-            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
-            <mat-datepicker #startPicker></mat-datepicker>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-            <mat-label>Fecha de fin</mat-label>
-            <input
-                matInput
-                [matDatepicker]="endPicker"
-                name="endDate"
-                formControlName="endDate"
-                (dateChange)="endDateChange($event)" />
-            <mat-hint>MM/DD/YYYY</mat-hint>
-            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
-            <mat-datepicker #endPicker></mat-datepicker>
-        </mat-form-field>
-
-        <button mat-button type="submit">Obtener tipo de cambio</button>
-    </form>
 </div>
 
 <div class="home-table-container">
@@ -89,4 +54,41 @@
             </canvas>
         </div>
     </div>
+</div>
+}
+
+<hr class="home-horizontal-line" />
+
+<div class="home-banxico">
+    <form (submit)="banxicoFormSubmit()" [formGroup]="banxicoForm">
+        <mat-form-field class="home-banxico-field home-banxico-token-field" appearance="outline">
+            <input matInput type="text" formControlName="banxicoToken" placeholder="Ingrese token de Banxico" />
+        </mat-form-field>
+
+        <mat-form-field class="home-banxico-field" appearance="outline">
+            <mat-label>Fecha de inicio</mat-label>
+            <input matInput [matDatepicker]="startPicker" name="startDate" formControlName="startDate"
+                (dateChange)="startDateChange($event)" />
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field class="home-banxico-field" appearance="outline">
+            <mat-label>Fecha de fin</mat-label>
+            <input matInput [matDatepicker]="endPicker" name="endDate" formControlName="endDate"
+                (dateChange)="endDateChange($event)" />
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+
+        <button mat-button type="submit">Obtener tipo de cambio</button>
+    </form>
+
+    @if (displayBanxicoTable) {
+    <div class="home-banxico-table">
+        <app-banxico-table-view [banxicoRecords]="banxicoRecords" />
+    </div>
+    }
 </div>

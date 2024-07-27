@@ -4,7 +4,7 @@ import { HttpClient } from "@angular/common/http";
 import { share } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { DocumentTableViewComponent } from '../../components/document-table-view/document-table-view.component';
-import { IBanxicoSerie, IExcelDocument, IExcelRecord } from '../../shared/interfaces';
+import { IBanxicoRecord, IBanxicoSerie, IExcelDocument, IExcelRecord } from '../../shared/interfaces';
 import { CommonModule } from '@angular/common';
 import { UPLOAD_FILE_ENDPOINT, WEATHER_TEMPERATURE_ENDPOINT, BANXICO_EXCHANGE_RATE_ENDPOINT } from '../../shared/constants';
 import { Chart, registerables } from "chart.js";
@@ -15,6 +15,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { DatePipe } from '@angular/common';
+import { BanxicoTableViewComponent } from "../../components/banxico-table-view/banxico-table-view.component";
 
 Chart.register(...registerables);
 
@@ -32,8 +33,9 @@ Chart.register(...registerables);
     ReactiveFormsModule,
     MatDatepickerModule,
     MatFormFieldModule,
-    MatNativeDateModule
-  ],
+    MatNativeDateModule,
+    BanxicoTableViewComponent
+],
   providers: [provideNativeDateAdapter(), DatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
@@ -45,6 +47,7 @@ export class HomeComponent implements OnInit {
   excelRecords: IExcelRecord[] = [];
 
   // statistics
+  displayStatistics: boolean = false;
   minCurrentBalanceRecord: IExcelRecord | null = null;
   maxCurrentBalanceRecord: IExcelRecord | null = null;
   currentBalanceSum: number = 0.0;
@@ -67,6 +70,8 @@ export class HomeComponent implements OnInit {
   recordList: IExcelRecord[] = [];
 
   // banxico
+  displayBanxicoTable: boolean = false;
+  banxicoRecords: IBanxicoRecord[] = [];
   startDate: string | null = "";
   endDate: string | null = "";
   banxicoForm = new FormGroup({
@@ -89,6 +94,7 @@ export class HomeComponent implements OnInit {
   }
 
   fileUploaded(event: any) {
+    this.displayStatistics = true;
     let formData = event as FormData;
     this.http.post<IExcelDocument>(UPLOAD_FILE_ENDPOINT, formData).pipe(share())
       .subscribe(data => {
@@ -280,8 +286,9 @@ export class HomeComponent implements OnInit {
     const banxicoToken: string | null | undefined = this.banxicoForm.value.banxicoToken;
     this.http.get<IBanxicoSerie>(`${BANXICO_EXCHANGE_RATE_ENDPOINT}/${this.startDate}/${this.endDate}/${banxicoToken}`).pipe(share())
     .subscribe(data => {
+      this.displayBanxicoTable = true;
       const serie: IBanxicoSerie = data;
-      console.log(serie);
+      this.banxicoRecords = serie.records;
     }, errorObject => {
       this.toastr.error(errorObject.error);
     });

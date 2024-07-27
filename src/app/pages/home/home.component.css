@@ -82,3 +82,21 @@
     top: 40px;
     left: 10px;
 }
+
+.home-horizontal-line {
+    position: relative;
+    top: 20px;
+}
+
+.home-banxico-token-field {
+    width: 300px;
+}
+
+.home-banxico-field {
+    padding-right: 5px;
+}
+
+.home-banxico-table {
+    position: relative;
+    top: 20px;
+}
